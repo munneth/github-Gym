@@ -5,7 +5,7 @@ import csv
 
 r = requests.get('https://rec.ucdavis.edu/facilityoccupancy')
 
-print(r)
+#print(r)
 
 soup = BeautifulSoup(r.content, 'html.parser')
 
@@ -13,10 +13,11 @@ def getOccupancy():
     #gathering current arc occupancy
     s = soup.find('div', class_ = 'occupancy-details')
     occupancy = s.find_all('strong')
-    occupancy = str(list(occupancy[1]))
+    occupancy = str(list(occupancy[1]))#see what this does
+    print(type(occupancy))
     return occupancy
 
-def getTime():
+def getTime(): ####
     #getting current time
     currentTime = time.localtime()
     formattedTime = time.strftime("%H:%M", currentTime)
@@ -35,7 +36,8 @@ def main():
         #print(getTime())
         if adjTime == "00" or adjTime == "30":
             timeData[getTime()] = getOccupancy()
-            
+            printableTimeData['time'] = getTime()
+            printableTimeData['occupancy'] = getOccupancy()
             print(timeData)
             continue
         else:
@@ -55,4 +57,4 @@ def main():
 
     return timeData
 
-main()
+#print(getOccupancy())
