@@ -13,7 +13,8 @@ app = Flask(__name__)
 
 # Dictionary to store occupancy data and last update time
 timeData = {}
-lastUpdateTime = 0
+#lastUpdateTime = 0
+
 
 # Directory to save generated plots
 STATIC_DIR = os.path.join(app.root_path, 'static', 'images')
@@ -24,8 +25,8 @@ def fetchData():
     """
     Fetch data from webscraper and update timeData dictionary every 30 minutes.
     """
-    global lastUpdateTime
-    lastUpdateTime = 0
+    #global lastUpdateTime
+    #lastUpdateTime = 0
     now = datetime.now()
 
     if now.minute in [0, 30]:
@@ -33,11 +34,11 @@ def fetchData():
         occupancy = webscraper.getOccupancy()
         formattedTime = webscraper.getTime()
         timeData[formattedTime] = occupancy
-        lastUpdateTime = time.time()  # Update the last update timestamp
+        #lastUpdateTime = time.time()  # Update the last update timestamp
 
 def generate_plot():
     fig, ax = plt.subplots(figsize=(10, 10))
-    #print(timeData)
+    print(timeData)
     time = list(timeData.keys())
     #for str in time:
         #str = int(str)
@@ -48,13 +49,13 @@ def generate_plot():
         number = int(number[2:5])
         intOccupants.append(number)
 
-    
-
-    bar_colors = ['tab:blue'] * len(time)
+    bar_colors = ['#393b37'] * len(time)
     ax.bar(time, intOccupants, color=bar_colors)
     ax.set_xlabel('Time')
     ax.set_ylabel('Occupancy')
     ax.set_title('Generated Plot')
+    ax.set_facecolor("#4b4b87")
+    
     ax.tick_params(axis='x', rotation=45)  # Rotate x-axis labels for readability
 
     # Save plot as a static file
@@ -63,19 +64,22 @@ def generate_plot():
     plt.close()  # Close the figure to free memory
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(fetchData, 'interval', minutes=1)  # Run fetchData every minute
+scheduler.add_job(fetchData, 'interval', minutes=1)
 scheduler.add_job(generate_plot, 'interval', minutes=1)
 scheduler.start()
 
+
+
 @app.route('/')
 def arc():
-    
+    occupancyOnRefresh = webscraper.getOccupancy()
     fetchData()  # Ensure the data is updated
     generate_plot()  # Generate and save the plot
-
+    webscraper.getOccupancy()
     # Render the template with occupancy data
-    return render_template('arc.html', timeData=timeData)
+    return render_template('arc.html', timeData=timeData, occupancyOnRefresh = occupancyOnRefresh, time = webscraper.getTime())
 
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+

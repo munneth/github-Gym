@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="1800">
-
+    <link rel="stylesheet" href="static/style.css" />
     <title>ARC Occupancy</title>
 </head>
 <body>
     <h1>ARC Occupancy Data</h1>
     <div>
         <h2>Occupancy Details</h2>
-        {% for time, occupancy in timeData.items() %}
-            <p>Time: {{ time }}, Occupancy: {{ occupancy }}</p>
-        {% endfor %}
+        
+            <p>Time: {{ time }}, Occupancy: {{ occupancyOnRefresh }}</p>
+        
     </div>
     <div>
         <h2>Occupancy Trend</h2>

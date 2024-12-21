@@ -3,14 +3,16 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 
-r = requests.get('https://rec.ucdavis.edu/facilityoccupancy')
+#r = requests.get('https://rec.ucdavis.edu/facilityoccupancy')
 
 #print(r)
 
-soup = BeautifulSoup(r.content, 'html.parser')
+#soup = BeautifulSoup(r.content, 'html.parser')
 
 def getOccupancy():
     #gathering current arc occupancy
+    r = requests.get('https://rec.ucdavis.edu/facilityoccupancy')
+    soup = BeautifulSoup(r.content, 'html.parser')
     s = soup.find('div', class_ = 'occupancy-details')
     occupancy = s.find_all('strong')
     occupancy = str(list(occupancy[1]))#see what this does
