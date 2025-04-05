@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import webscraper
 from datetime import datetime
 import time
@@ -8,8 +8,10 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 from apscheduler.schedulers.background import BackgroundScheduler
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Dictionary to store occupancy data and last update time
 timeData = {}
@@ -77,8 +79,21 @@ def arc():
     generate_plot()  # Generate and save the plot
     webscraper.getOccupancy()
     # Render the template with occupancy data
+
     return render_template('arc.html', timeData=timeData, occupancyOnRefresh = occupancyOnRefresh, time = webscraper.getTime())
 
+@app.route("/api/info")
+def send_info():
+    occupancyOnRefresh = webscraper.getOccupancy()
+    fetchData()  # Ensure the data is updated
+    generate_plot()  # Generate and save the plot
+    webscraper.getOccupancy()
+    # Render the template with occupancy data
+    return jsonify({
+            'occupancy': occupancyOnRefresh.strip("[]'"),
+            'timeData': timeData,
+            'time': webscraper.getTime()
+        })
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
