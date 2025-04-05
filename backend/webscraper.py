@@ -20,10 +20,21 @@ def getOccupancy():
     return occupancy
 
 def getTime(): ####
-    #getting current time
+    # Getting current time in 24-hour format
     currentTime = time.localtime()
-    formattedTime = time.strftime("%H:%M", currentTime)
+    hour = currentTime.tm_hour
+    minute = currentTime.tm_min
+
+    # Convert to 12-hour format with AM/PM
+    am_pm = "AM" if hour < 12 else "PM"
+    hour_12 = hour % 12
+    if hour_12 == 0:
+        hour_12 = 12  # 0 becomes 12 in 12-hour format
+
+    formattedTime = f"{hour_12}:{minute:02d} {am_pm}"
     return formattedTime
+
+
 def lastUpdateTime():
     lastUpdate = time()
     return lastUpdate

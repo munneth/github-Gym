@@ -8,11 +8,13 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card"
+import { time } from "console";
 
 interface PlotInfo {
   occupancy: string
   timeData: Record<string, string>
   time: string
+  bestTime: string
 }
 
 export default function HomePage() {
@@ -41,7 +43,8 @@ export default function HomePage() {
             />
           <p className="text-sm text-muted-foreground text-center">
             Current occupancy: <strong>{plotInfo.occupancy}</strong><br />
-            Time: <span className="italic">{plotInfo.time}</span>
+            Time: <span className="italic">{plotInfo.time}</span><br />
+            Best Time To Visit: <span className="italic">{plotInfo.bestTime}</span>
           </p>
           <div className="w-full mt-4">
             <h3 className="text-sm font-semibold mb-1">History</h3>

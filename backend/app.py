@@ -51,12 +51,12 @@ def generate_plot():
         number = int(number[2:5])
         intOccupants.append(number)
 
-    bar_colors = ['#393b37'] * len(time)
+    bar_colors = ['#FFD100'] * len(time)
     ax.bar(time, intOccupants, color=bar_colors)
     ax.set_xlabel('Time')
     ax.set_ylabel('Occupancy')
     ax.set_title('Generated Plot')
-    ax.set_facecolor("#4b4b87")
+    ax.set_facecolor("#002855")
     
     ax.tick_params(axis='x', rotation=45)  # Rotate x-axis labels for readability
 
@@ -70,7 +70,16 @@ scheduler.add_job(fetchData, 'interval', minutes=1)
 scheduler.add_job(generate_plot, 'interval', minutes=1)
 scheduler.start()
 
-
+def findBestTime():
+    """
+    Find the best time to visit based on occupancy data.
+    """
+    # Convert timeData to a list of tuples (time, occupancy)
+    occupancy_list = [(time, int(occupancy[2:5])) for time, occupancy in timeData.items()]
+    # Sort by occupancy
+    occupancy_list.sort(key=lambda x: x[1])
+    # Return the time with the lowest occupancy
+    return occupancy_list[0] if occupancy_list else None
 
 @app.route('/')
 def arc():
@@ -88,11 +97,13 @@ def send_info():
     fetchData()  # Ensure the data is updated
     generate_plot()  # Generate and save the plot
     webscraper.getOccupancy()
+    findBestTime()
     # Render the template with occupancy data
     return jsonify({
             'occupancy': occupancyOnRefresh.strip("[]'"),
             'timeData': timeData,
-            'time': webscraper.getTime()
+            'time': webscraper.getTime(),
+            'best time': findBestTime()
         })
 
 if __name__ == '__main__':
