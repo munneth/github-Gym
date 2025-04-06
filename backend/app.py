@@ -41,29 +41,24 @@ def fetchData():
 def generate_plot():
     fig, ax = plt.subplots(figsize=(10, 10))
     print(timeData)
-    time = list(timeData.keys())
-    #for str in time:
-        #str = int(str)
-    
-    stringOccupants = list(timeData.values())
-    intOccupants = []
-    for number in stringOccupants:
-        number = int(number[2:5])
-        intOccupants.append(number)
+    times = list(timeData.keys())
 
-    bar_colors = ['#FFD100'] * len(time)
-    ax.bar(time, intOccupants, color=bar_colors)
+    # Convert each stored string occupant to an integer
+    string_occupants = list(timeData.values())
+    int_occupants = [int(occ) for occ in string_occupants]  # No slicing here
+
+    bar_colors = ['#FFD100'] * len(times)
+    ax.bar(times, int_occupants, color=bar_colors)
     ax.set_xlabel('Time')
     ax.set_ylabel('Occupancy')
     ax.set_title('Generated Plot')
     ax.set_facecolor("#002855")
-    
     ax.tick_params(axis='x', rotation=45)  # Rotate x-axis labels for readability
 
     # Save plot as a static file
     plot_path = os.path.join(STATIC_DIR, 'plot.png')
     plt.savefig(plot_path)
-    plt.close()  # Close the figure to free memory
+    plt.close()
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(fetchData, 'interval', minutes=1)

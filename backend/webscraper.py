@@ -3,23 +3,17 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 
-#r = requests.get('https://rec.ucdavis.edu/facilityoccupancy')
-
-#print(r)
-
-#soup = BeautifulSoup(r.content, 'html.parser')
-
 def getOccupancy():
-    #gathering current arc occupancy
+    # Gathering current arc occupancy
     r = requests.get('https://rec.ucdavis.edu/facilityoccupancy')
     soup = BeautifulSoup(r.content, 'html.parser')
-    s = soup.find('div', class_ = 'occupancy-details')
-    occupancy = s.find_all('strong')
-    occupancy = str(list(occupancy[1]))#see what this does
-    print(type(occupancy))
-    return occupancy
+    s = soup.find('div', class_='occupancy-details')
+    occupancy_elements = s.find_all('strong')
+    # Extract the text from the second <strong> element and strip any extra whitespace
+    occupancy_value = occupancy_elements[1].text.strip()
+    return occupancy_value
 
-def getTime(): ####
+def getTime():
     # Getting current time in 24-hour format
     currentTime = time.localtime()
     hour = currentTime.tm_hour
@@ -34,10 +28,8 @@ def getTime(): ####
     formattedTime = f"{hour_12}:{minute:02d} {am_pm}"
     return formattedTime
 
-
 def lastUpdateTime():
-    lastUpdate = time()
-    return lastUpdate
+    return time.time()
 
 def main():
     timeData = {}
@@ -45,8 +37,6 @@ def main():
 
     while getTime() != "00:01":
         adjTime = getTime()[3:5]
-        #print(adjTime)
-        #print(getTime())
         if adjTime == "00" or adjTime == "30":
             timeData[getTime()] = getOccupancy()
             printableTimeData['time'] = getTime()
@@ -56,18 +46,14 @@ def main():
         else:
             continue
 
-    #open and add header to csv
-    f = open("data.csv", "a")
-    header = ["Time", "Occupancy(Max 2500)"]
-    for head in header:
-        f.write(head + ",")
-    f.write("\n")
-
-    #traverse the dictionary and add to csv file
-    for key, value in timeData.items():
-        f.write(key + "," + value + "\n")
-    f.close()
-
+    # Open and add header to csv
+    with open("data.csv", "a") as f:
+        header = ["Time", "Occupancy(Max 2500)"]
+        f.write(",".join(header) + "\n")
+        # Traverse the dictionary and add to csv file
+        for key, value in timeData.items():
+            f.write(key + "," + value + "\n")
     return timeData
 
-#print(getOccupancy())
+# Uncomment to run main if needed
+# print(getOccupancy())
