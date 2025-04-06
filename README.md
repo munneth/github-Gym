@@ -16,6 +16,8 @@ The **github-Gym** project is designed to help students plan their gym visits by
 - **Flask Backend & JSON API:** Provides a web interface and an API endpoint for accessing current occupancy data.
 - **Next.js Frontend:** A modern, user-friendly interface bootstrapped with Create Next App.
 
+  ![Alt Text](https://i.imgur.com/t2mEY6K.png)
+
 ## Project Structure
 ```bash
 github-Gym/
