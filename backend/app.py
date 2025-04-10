@@ -15,37 +15,30 @@ CORS(app)
 
 # Dictionary to store occupancy data and last update time
 timeData = {}
-#lastUpdateTime = 0
-
 
 # Directory to save generated plots
 STATIC_DIR = os.path.join(app.root_path, 'static', 'images')
 os.makedirs(STATIC_DIR, exist_ok=True)  # Create directory if it doesn't exist
 
-
 def fetchData():
     """
     Fetch data from webscraper and update timeData dictionary every 30 minutes.
     """
-    #global lastUpdateTime
-    #lastUpdateTime = 0
     now = datetime.now()
-
     if now.minute in [0, 30]:
         print(f"Fetching new data at fixed interval: {now.strftime('%H:%M:%S')}")
         occupancy = webscraper.getOccupancy()
         formattedTime = webscraper.getTime()
         timeData[formattedTime] = occupancy
-        #lastUpdateTime = time.time()  # Update the last update timestamp
 
 def generate_plot():
     fig, ax = plt.subplots(figsize=(10, 10))
     print(timeData)
     times = list(timeData.keys())
 
-    # Convert each stored string occupant to an integer
+    # Convert each stored occupancy string to an integer
     string_occupants = list(timeData.values())
-    int_occupants = [int(occ) for occ in string_occupants]  # No slicing here
+    int_occupants = [int(occ) for occ in string_occupants]  # Use the full occupancy value
 
     bar_colors = ['#FFD100'] * len(times)
     ax.bar(times, int_occupants, color=bar_colors)
@@ -70,37 +63,32 @@ def findBestTime():
     Find the best time to visit based on occupancy data.
     """
     # Convert timeData to a list of tuples (time, occupancy)
-    occupancy_list = [(time, int(occupancy[2:5])) for time, occupancy in timeData.items()]
-    # Sort by occupancy
+    occupancy_list = [(t, int(occ)) for t, occ in timeData.items()]
+    # Sort by occupancy (lowest first)
     occupancy_list.sort(key=lambda x: x[1])
-    # Return the time with the lowest occupancy
-    return occupancy_list[0] if occupancy_list else None
+    # Return only the time of the tuple with the lowest occupancy
+    return occupancy_list[0][0] if occupancy_list else None
 
 @app.route('/')
 def arc():
     occupancyOnRefresh = webscraper.getOccupancy()
     fetchData()  # Ensure the data is updated
     generate_plot()  # Generate and save the plot
-    webscraper.getOccupancy()
     # Render the template with occupancy data
-
-    return render_template('arc.html', timeData=timeData, occupancyOnRefresh = occupancyOnRefresh, time = webscraper.getTime())
+    return render_template('arc.html', timeData=timeData, occupancyOnRefresh=occupancyOnRefresh, time=webscraper.getTime())
 
 @app.route("/api/info")
 def send_info():
     occupancyOnRefresh = webscraper.getOccupancy()
     fetchData()  # Ensure the data is updated
     generate_plot()  # Generate and save the plot
-    webscraper.getOccupancy()
-    findBestTime()
-    # Render the template with occupancy data
+    best_time = findBestTime()
     return jsonify({
             'occupancy': occupancyOnRefresh.strip("[]'"),
             'timeData': timeData,
             'time': webscraper.getTime(),
-            'best time': findBestTime()
+            'bestTime': best_time  # Updated key and value here
         })
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-
