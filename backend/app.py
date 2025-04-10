@@ -38,7 +38,7 @@ def generate_plot():
 
     # Convert each stored occupancy string to an integer
     string_occupants = list(timeData.values())
-    int_occupants = [int(occ) for occ in string_occupants]  # Use the full occupancy value
+    int_occupants = [int(occ) for occ in string_occupants]  
 
     bar_colors = ['#FFD100'] * len(times)
     ax.bar(times, int_occupants, color=bar_colors)
@@ -46,7 +46,7 @@ def generate_plot():
     ax.set_ylabel('Occupancy')
     ax.set_title('Generated Plot')
     ax.set_facecolor("#002855")
-    ax.tick_params(axis='x', rotation=45)  # Rotate x-axis labels for readability
+    ax.tick_params(axis='x', rotation=45) 
 
     # Save plot as a static file
     plot_path = os.path.join(STATIC_DIR, 'plot.png')
@@ -80,8 +80,8 @@ def arc():
 @app.route("/api/info")
 def send_info():
     occupancyOnRefresh = webscraper.getOccupancy()
-    fetchData()  # Ensure the data is updated
-    generate_plot()  # Generate and save the plot
+    fetchData()  
+    generate_plot()  
     best_time = findBestTime()
     return jsonify({
             'occupancy': occupancyOnRefresh.strip("[]'"),
